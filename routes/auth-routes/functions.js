@@ -1,5 +1,5 @@
 const User = require("../../models/User.model");
-const { genSalt, hash } = require("bcryptjs");
+const { genSalt, hash, compare } = require("bcryptjs");
 const { sign } = require("jsonwebtoken");
 
 const checkSignupInputs = async inputs => {
@@ -78,4 +78,44 @@ const signup = async bodyInputs => {
     return { user: payload, token };
 };
 
-module.exports = { signup };
+const checkLoginInputs = async inputs => {
+    const { username: usernameInput, password } = await inputs;
+    
+    if (!usernameInput) {
+        const error = new Error("Username is required!");
+        error.status = 400;
+        throw error;
+    };
+    if (!password) {
+        const error = new Error("Password is required!");
+        error.status = 400;
+        throw error;
+    };
+
+    const user = await User.findOne({ username: usernameInput }, { createdAt: 0, updatedAt: 0, __v: 0 });
+    if (!user) {
+        const error = new Error ("Invalid username or password!");
+        error.status = 401;
+        throw error;
+    };
+
+    const compareHash = await compare(password, user.password);
+    if (!compareHash) {
+        const error = new Error("Invalid username or password!");
+        error.status = 401;
+        throw error;
+    };
+
+    const { _id, username, name, profileImage, reports, comments, readLater } = await user;
+
+    return { _id, username, name, profileImage, reports, comments, readLater };
+};
+
+const login = async bodyInputs => {
+    const payload = await checkLoginInputs(bodyInputs);
+    const token = sign(payload, process.env.SECRET_JWT, { expiresIn: "1day" });
+
+    return { user: payload, token };
+};
+
+module.exports = { signup, login };
