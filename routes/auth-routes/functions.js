@@ -2,30 +2,48 @@ const User = require("../../models/User.model");
 const { genSalt, hash } = require("bcryptjs");
 const { sign } = require("jsonwebtoken");
 
-const signupErrorMsgs = {
-    missingUsername: "Username is required!",
-    missingName: "Name is required!",
-    invalidName: "Name can only contain letters and letters with accents!",
-    usedUsername: "Username already used!",
-    missingPassword: "Password is required!",
-    missingPasswordConfirmation: "Password confirmation is required!",
-    differentPasswordConfirmation: "Password confirmation is different!"
-};
-
 const checkSignupInputs = async inputs => {
     const { username, name, password, passwordConfirmation, profileImage } = await inputs;
 
-    if (!username) throw new Error(signupErrorMsgs.missingUsername);
+    if (!username) {
+        const error = new Error("Username is required!");
+        error.status = 400;
+        throw error;
+    };
 
     const user = await User.findOne({ username }, { _id: 0, username: 1 });
-    if (user) throw new Error(signupErrorMsgs.usedUsername);
+    if (user) {
+        const error = new Error("Username already used!");
+        error.status = 409;
+        throw error;
+    };
 
-    if (!name) throw new Error(signupErrorMsgs.missingName);
-    if (!/^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ ]+$/.test(name)) throw new Error (signupErrorMsgs.invalidName);
+    if (!name) {
+        const error = new Error("Name is required!");
+        error.status = 400;
+        throw error;
+    };
+    if (!/^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ ]+$/.test(name)) {
+        const error = new Error ("Name can only contain letters and letters with accents!");
+        error.status = 400;
+        throw error;
+    };
 
-    if (!password) throw new Error(signupErrorMsgs.missingPassword);
-    if (!passwordConfirmation) throw new Error(signupErrorMsgs.missingPasswordConfirmation);
-    if (password !== passwordConfirmation) throw new Error(signupErrorMsgs.differentPasswordConfirmation);
+    if (!password) {
+        const error = new Error("Password is required!");
+        error.status = 400;
+        throw error;
+    };
+    if (!passwordConfirmation) {
+        const error = new Error("Password confirmation is required!");
+        error.status = 400;
+        throw error;
+    };
+    if (password !== passwordConfirmation) {
+        const error = new Error("Password confirmation is different!");
+        error.status = 400;
+        throw error;
+    };
 
     const checkedInputs = { username, name, password };
     if (profileImage) checkedInputs.profileImage = profileImage;
@@ -60,24 +78,4 @@ const signup = async bodyInputs => {
     return { user: payload, token };
 };
 
-const signupErrorStatus = errorMessage => {
-    let status;
-    switch (errorMessage) {
-        case signupErrorMsgs.missingUsername:
-        case signupErrorMsgs.missingName:
-        case signupErrorMsgs.invalidName:
-        case signupErrorMsgs.missingPassword:
-        case signupErrorMsgs.missingPasswordConfirmation:
-        case signupErrorMsgs.differentPasswordConfirmation:
-            status = 400;
-            break;
-        case signupErrorMsgs.usedUsername:
-            status = 409;
-            break;
-        default:
-            status = 500;
-    };
-    return status;
-};
-
-module.exports = { signup, signupErrorStatus };
+module.exports = { signup };
