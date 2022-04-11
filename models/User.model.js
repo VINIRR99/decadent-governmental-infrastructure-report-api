@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { model, Schema } = require("mongoose");
 
 module.exports = model("User", new Schema(
     {
