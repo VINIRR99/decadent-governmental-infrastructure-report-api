@@ -4,7 +4,7 @@ module.exports = model("Comment", new Schema(
     {
         user: { type: Schema.Types.ObjectId, ref: "User", required: true },
         report: { type: Schema.Types.ObjectId, ref: "Report", required: true },
-        comment: { type: String, trim: true }
+        comment: { type: String, trim: true, maxlength: 2200 }
     },
     { timestamps: true }
 ));
