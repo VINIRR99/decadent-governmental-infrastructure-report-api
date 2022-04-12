@@ -1,4 +1,4 @@
-const User = require("../../models/User.model");
+const User = require("../../../models/User.model");
 
 module.exports = async userId => {
     if (!(userId.length === 24) || !/^[a-z0-9]+$/.test(userId)) {
