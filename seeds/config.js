@@ -8,7 +8,7 @@ const connectDB = async () => {
         const { connections, disconnect } = await connect(process.env.MONGODB_URI);
         console.log(`Connected to the database: ${connections[0].name}`);
         return disconnect;
-    } catch (error) {console.error("Error while connecting to the databse", error)};
+    } catch (error) {throw { message: "Error while trying to connect to the database", error: error.message }};
 };
 
 const run = async () => {
@@ -16,6 +16,7 @@ const run = async () => {
     try {
         await plantSeeds();
     } catch (error) {
+        disconnect();
         console.error(error);
     } finally {
         disconnect();
