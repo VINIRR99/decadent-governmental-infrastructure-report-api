@@ -38,4 +38,37 @@ const postNewReport = async (userId, inputs) => {
     return newReport;
 };
 
-module.exports = { postNewReport };
+const checkUpudateReportInputs = async (reportId, inputs) => {
+
+    if (!(reportId.length === 24) || !/^[a-z0-9]+$/.test(reportId)) {
+        const error = new Error("Provided _id for the report is invalid!");
+        error.status = 400;
+        throw error;
+    };
+
+    const { description, image, location, fixed } = await inputs;
+
+    const checkedInputs = {};
+    if (description) checkedInputs.description = description;
+    if (image) checkedInputs.image = image;
+    if (location) checkedInputs.location = location;
+    if (fixed) {
+        if (typeof(fixed) !== "boolean") {
+            const error = new Error("fixed field must always be a boolean!");
+            error.status = 400;
+            throw error;
+        };
+        checkedInputs.fixed = fixed;
+    };
+
+    return checkedInputs;
+};
+
+const updateReport = async (reportId, userId, inputs) => {
+    const checkedInputs = await checkUpudateReportInputs(reportId, inputs);
+    const updatedReport = await Report.findOneAndUpdate({ _id: reportId, user: userId }, checkedInputs, { new: true })
+        .select("-__v").populate("user", "username name profileImage");
+    return updatedReport;
+};
+
+module.exports = { postNewReport, updateReport };
