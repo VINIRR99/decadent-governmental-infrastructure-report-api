@@ -12,9 +12,9 @@ module.exports = model("User", new Schema(
         },
         password: { type: String, required: true },
         profileImage: { type: String, default: "https://cdn-icons-png.flaticon.com/512/149/149071.png" },
-        reports: [{ type: Schema.Types.ObjectId, ref: "Reports" }],
+        reports: [{ type: Schema.Types.ObjectId, ref: "Report" }],
         comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
-        readLater: [{ type: Schema.Types.ObjectId, ref: "Reports" }]
+        readLater: [{ type: Schema.Types.ObjectId, ref: "Report" }]
     },
     { timestamps: true }
 ));

@@ -24,19 +24,12 @@ const checkReportCreationInputs = async (userId, inputs) => {
 };
 
 const createReport = async newReport => {
-    const {
-        _id: reportId,
-        user: userId,
-        description,
-        image,
-        location,
-        fixed,
-        comments,
-        createdAt,
-        updatedAt
-    } = await Report.create(newReport);
+    const { _id: reportId, user: userId } = await Report.create(newReport);
     await User.findByIdAndUpdate(userId, { $push: { reports: reportId } });
-    return { _id: reportId, user: userId, description, image, location, fixed, comments, createdAt, updatedAt };
+
+    const cretedReport = await Report.findById(reportId, { __v: 0 }).populate("user", "username name profileImage");
+
+    return cretedReport;
 };
 
 const postNewReport = async (userId, inputs) => {

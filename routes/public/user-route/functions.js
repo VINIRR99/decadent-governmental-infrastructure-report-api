@@ -8,7 +8,8 @@ module.exports = async userId => {
     };
 
     const user = await User.findById(userId, { password: 0, createdAt: 0, updatedAt: 0, __v: 0 })
-    .populate("reports");
+        .populate("reports", "-__v");
+
     if (!user) {
         const error = new Error("Provided _id for user does not match with any user in our database!");
         error.status = 404;
