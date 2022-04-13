@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { postNewReport, updateReport } = require("./functions");
+const { postNewReport, updateReport, deleteReport } = require("./functions");
 
 const router = Router();
 
@@ -27,6 +27,18 @@ router.put("/:reportId", async (req, res) => {
             error.message = "The provided _id for the report does not match any report in our database!";
         };
         res.status(error.status).json({ message: "Error when trying to update report!", error: error.message  });
+    };
+});
+
+router.delete("/:reportId", async (req, res) => {
+    try {
+        const { reportId } = req.params;
+        const { _id: userId } = await req.user;
+        await deleteReport(reportId, userId);
+        res.status(204).json();
+    } catch (error) {
+        if (!error.status) error.status = 500;
+        res.status(error.status).json({ message: "Error while trying to delete report!", error: error.message });
     };
 });
 

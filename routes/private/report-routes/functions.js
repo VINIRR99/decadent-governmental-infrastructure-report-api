@@ -1,5 +1,6 @@
 const Report = require("../../../models/Report.model");
 const User = require("../../../models/User.model");
+const Comment = require("../../../models/Comment.model");
 
 const checkReportCreationInputs = async (userId, inputs) => {
     const { description, image, location  } = await inputs;
@@ -71,4 +72,24 @@ const updateReport = async (reportId, userId, inputs) => {
     return updatedReport;
 };
 
-module.exports = { postNewReport, updateReport };
+const deleteReport = async (reportId, userId) => {
+    if (!(reportId.length === 24) || !/^[a-z0-9]+$/.test(reportId)) {
+        const error = new Error("Provided _id for the report is invalid!");
+        error.status = 400;
+        throw error;
+    };
+
+    const deletedReport = await Report.findOneAndDelete({ _id: reportId, user: userId }).select("_id");
+
+    if (!deletedReport) {
+        const error = new Error("The provided _id for the report does not match any report in our database!");
+        error.status = 404;
+        throw error;
+    };
+
+    await User.findByIdAndUpdate(userId, { $pull: { reports: reportId } });
+
+    //return deletedReport;
+};
+
+module.exports = { postNewReport, updateReport, deleteReport };
