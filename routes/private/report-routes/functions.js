@@ -88,8 +88,7 @@ const deleteReport = async (reportId, userId) => {
     };
 
     await User.findByIdAndUpdate(userId, { $pull: { reports: reportId } });
-
-    //return deletedReport;
+    await Comment.deleteMany({ report: reportId });
 };
 
 module.exports = { postNewReport, updateReport, deleteReport };
