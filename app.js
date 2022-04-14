@@ -20,7 +20,7 @@ app.use(cors(corsOptions));
 
 app.use("/auth", require("./routes/public/auth-routes"));
 app.use("/user", require("./routes/public/user-route"));
-app.use("/reports", require("./routes/public/report.route"));
+app.use("/reports", require("./routes/public/report-routes"));
 
 app.use(require("./middlewares/auth.middleware"));
 

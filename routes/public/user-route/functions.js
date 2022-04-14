@@ -13,6 +13,7 @@ module.exports = async userId => {
         populate: {
             path: "comments",
             select: "-__v -report",
+            limit: 3,
             populate: { path: "user", select: "name username profileImage" }
         }
     }).populate({

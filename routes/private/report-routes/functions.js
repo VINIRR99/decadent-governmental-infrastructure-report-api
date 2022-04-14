@@ -17,9 +17,8 @@ const checkReportCreationInputs = async (userId, inputs) => {
         throw error;
     };
 
-    const checkedInputs = { image, location };
+    const checkedInputs = { image, location, user: userId };
     if (description) checkedInputs.description = description;
-    checkedInputs.user = userId;
 
     return checkedInputs;
 };
