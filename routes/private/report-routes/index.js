@@ -24,7 +24,7 @@ router.put("/:reportId", async (req, res) => {
         if (!error.status) error.status = 500;
         if ((error.status === 500) && (error.path === "_id")) {
             error.status = 404;
-            error.message = "The provided _id for the report does not match any report in our database!";
+            error.message = "The provided _id for the report does not match any report you posted!";
         };
         res.status(error.status).json({ message: "Error when trying to update report!", error: error.message  });
     };
