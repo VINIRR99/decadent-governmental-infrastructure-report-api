@@ -68,7 +68,11 @@ const checkUpudateReportInputs = async (reportId, inputs) => {
 const updateReport = async (reportId, userId, inputs) => {
     const checkedInputs = await checkUpudateReportInputs(reportId, inputs);
     const updatedReport = await Report.findOneAndUpdate({ _id: reportId, user: userId }, checkedInputs, { new: true })
-        .select("-__v").populate("user", "username name profileImage");
+        .select("-__v").populate("user", "username name profileImage").populate({
+            path: "comments",
+            select: "-__v -report",
+            populate: { path: "user", select: "username name profileImage" }
+        });
     return updatedReport;
 };
 

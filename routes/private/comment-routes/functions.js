@@ -31,13 +31,14 @@ const checkReportId = async (updatedReport, commentId, userId) => {
 };
 
 const createComment = async (checkedInput, reportId, userId) => {
-    const { _id: commentId, user, report, comment, createdAt, updatedAt } = await Comment.create(checkedInput);
+    const { _id: commentId } = await Comment.create(checkedInput);
 
     const updatedReport = await Report.findByIdAndUpdate(reportId, { $push: { comments: commentId } }).select("_id");
-
     await checkReportId(updatedReport, commentId, userId);
+
+    const createdComment = await Comment.findById(commentId, { __v: 0 }).populate("user", "username name profileImage");
     await User.findByIdAndUpdate(userId, { $push: { comments: commentId } });
-    return { _id: commentId, user, report, comment, createdAt, updatedAt };
+    return createdComment;
 };
 
 const postNewComment = async (input, reportId, userId) => {
