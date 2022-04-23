@@ -2,6 +2,8 @@ const Comment = require("../../../models/Comment.model");
 const User = require("../../../models/User.model");
 const Report = require("../../../models/Report.model");
 
+const commentFunctions = {};
+
 const checkPostNewCommentInput = async (input, reportId, userId) => {
     if (!(reportId.length === 24) || !/^[a-z0-9]+$/.test(reportId)) {
         const error = new Error("Provided _id for the report is invalid!");
@@ -41,10 +43,10 @@ const createComment = async (checkedInput, reportId, userId) => {
     return createdComment;
 };
 
-const postNewComment = async (input, reportId, userId) => {
+commentFunctions.postNewComment = async (input, reportId, userId) => {
     const checkedInput = await checkPostNewCommentInput(input, reportId, userId);
     const createdComment = await createComment(checkedInput, reportId, userId);
     return createdComment;
 };
 
-module.exports = { postNewComment };
+module.exports = commentFunctions;

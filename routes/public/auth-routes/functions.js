@@ -2,6 +2,8 @@ const User = require("../../../models/User.model");
 const { genSalt, hash, compare } = require("bcryptjs");
 const { sign } = require("jsonwebtoken");
 
+const authFunctions = {};
+
 const checkSignupInputs = async inputs => {
     const { username, name, password, passwordConfirmation, profileImage } = await inputs;
 
@@ -67,7 +69,7 @@ const createUser = async newUser => {
     return { _id, username, name, profileImage, reports, comments, readLater };
 };
 
-const signup = async bodyInputs => {
+authFunctions.signup = async bodyInputs => {
     const userInputs = await checkSignupInputs(await bodyInputs);
     userInputs.name = capitalizeFirstLetter(userInputs.name);
     userInputs.password = await generatePasswordHash(userInputs.password);
@@ -111,11 +113,11 @@ const checkLoginInputs = async inputs => {
     return { _id, username, name, profileImage, reports, comments, readLater };
 };
 
-const login = async bodyInputs => {
+authFunctions.login = async bodyInputs => {
     const payload = await checkLoginInputs(bodyInputs);
     const token = sign(payload, process.env.SECRET_JWT, { expiresIn: "1day" });
 
     return { user: payload, token };
 };
 
-module.exports = { signup, login };
+module.exports = authFunctions;

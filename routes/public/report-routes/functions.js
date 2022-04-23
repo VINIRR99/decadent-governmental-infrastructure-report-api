@@ -1,6 +1,8 @@
 const Report = require("../../../models/Report.model");
 
-const getAllReports = async () => {
+const getReportFunctions = {};
+
+getReportFunctions.getAllReports = async () => {
     const reportsOrder = [{ boolean: false, order: 1 }, { boolean: true, order: -1 }];
     const reports = [];
     for (let i = 0; i < reportsOrder.length; i += 1) {
@@ -43,11 +45,11 @@ const checkReportExists = report => {
     };
 };
 
-const getOneReport = async reportId => {
+getReportFunctions.getOneReport = async reportId => {
     checkReportIdValid(reportId);
     const report = await findReport(reportId);
     checkReportExists(report);
     return report;
 };
 
-module.exports = { getAllReports, getOneReport };
+module.exports = getReportFunctions;

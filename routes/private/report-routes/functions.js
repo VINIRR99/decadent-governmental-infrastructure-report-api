@@ -2,6 +2,8 @@ const Report = require("../../../models/Report.model");
 const User = require("../../../models/User.model");
 const Comment = require("../../../models/Comment.model");
 
+const reportFunctions = {};
+
 const checkReportCreationInputs = async (userId, inputs) => {
     const { description, image, location  } = await inputs;
 
@@ -32,7 +34,7 @@ const createReport = async newReport => {
     return cretedReport;
 };
 
-const postNewReport = async (userId, inputs) => {
+reportFunctions.postNewReport = async (userId, inputs) => {
     const checkedInputs = await checkReportCreationInputs(userId, inputs);
     const newReport = await createReport(checkedInputs);
     return newReport;
@@ -64,12 +66,13 @@ const checkUpudateReportInputs = async (reportId, inputs) => {
     return checkedInputs;
 };
 
-const updateReport = async (reportId, userId, inputs) => {
+reportFunctions.updateReport = async (reportId, userId, inputs) => {
     const checkedInputs = await checkUpudateReportInputs(reportId, inputs);
     const updatedReport = await Report.findOneAndUpdate({ _id: reportId, user: userId }, checkedInputs, { new: true })
         .select("-__v").populate("user", "username name profileImage").populate({
             path: "comments",
             select: "-__v -report",
+            options: { sort: { createdAt: 1 } },
             populate: { path: "user", select: "username name profileImage" }
         });
     return updatedReport;
@@ -101,9 +104,9 @@ const removeReport = async (reportId, userId) => {
     await User.updateMany({ comments: { $in: commentsId } }, { $pull: { comments: { $in: commentsId } } });
 };
 
-const deleteReport = async (reportId, userId) => {
+reportFunctions.deleteReport = async (reportId, userId) => {
     checkDeleteReportIdValid(reportId);
     await removeReport(reportId, userId);
 };
 
-module.exports = { postNewReport, updateReport, deleteReport };
+module.exports = reportFunctions;
