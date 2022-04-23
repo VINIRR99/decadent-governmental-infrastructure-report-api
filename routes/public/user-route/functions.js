@@ -10,7 +10,7 @@ const checkUserGetRequest = async userId => {
         throw error;
     };
 
-    const user = await User.findById(userId, { password: 0, createdAt: 0, updatedAt: 0, __v: 0 }).populate({
+    const user = await User.findById(userId, { password: 0, __v: 0 }).populate({
         path: "reports",
         match: { fixed: false },
         select: "-__v -user",

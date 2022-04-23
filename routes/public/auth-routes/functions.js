@@ -94,7 +94,7 @@ const checkLoginInputs = async inputs => {
         throw error;
     };
 
-    const user = await User.findOne({ username: usernameInput }, { createdAt: 0, updatedAt: 0, __v: 0 });
+    const user = await User.findOne({ username: usernameInput }, { __v: 0 });
     if (!user) {
         const error = new Error ("Invalid username or password!");
         error.status = 401;
