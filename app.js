@@ -26,6 +26,7 @@ app.use(require("./middlewares/auth.middleware"));
 
 app.use("/reports", require("./routes/private/report-routes"));
 app.use("/comment", require("./routes/private/comment-routes"));
+app.use("/user", require("./routes/private/user-routes"));
 
 app.listen(process.env.PORT, () => console.log(`Server running on port: ${process.env.PORT}
 corsOptions:`, corsOptions));
