@@ -1,23 +1,15 @@
 const Report = require("../../../models/Report.model");
 const User = require("../../../models/User.model");
 const Comment = require("../../../models/Comment.model");
+const { throwError, checkId } = require("../../generalFunctions");
 
 const reportFunctions = {};
 
 const checkReportCreationInputs = async (userId, inputs) => {
     const { description, image, location  } = await inputs;
 
-    if (!image) {
-        const error = new Error("Image is required!");
-        error.status = 400;
-        throw error;
-    };
-
-    if (!location) {
-        const error = new Error("Location is required!");
-        error.status = 400;
-        throw error;
-    };
+    if (!image) throwError("Image is required!", 400);
+    if (!location) throwError("Location is required!", 400);
 
     const checkedInputs = { image, location, user: userId };
     if (description) checkedInputs.description = description;
@@ -41,12 +33,7 @@ reportFunctions.postNewReport = async (userId, inputs) => {
 };
 
 const checkUpudateReportInputs = async (reportId, inputs) => {
-
-    if (!(reportId.length === 24) || !/^[a-z0-9]+$/.test(reportId)) {
-        const error = new Error("Provided _id for the report is invalid!");
-        error.status = 400;
-        throw error;
-    };
+    checkId(reportId, "report");
 
     const { description, image, location, fixed } = await inputs;
 
@@ -55,11 +42,7 @@ const checkUpudateReportInputs = async (reportId, inputs) => {
     if (image) checkedInputs.image = image;
     if (location) checkedInputs.location = location;
     if (fixed) {
-        if (typeof(fixed) !== "boolean") {
-            const error = new Error("fixed field must always be a boolean!");
-            error.status = 400;
-            throw error;
-        };
+        if (typeof(fixed) !== "boolean") throwError("fixed field must always be a boolean!", 400);
         checkedInputs.fixed = fixed;
     };
 
@@ -75,28 +58,13 @@ reportFunctions.updateReport = async (reportId, userId, inputs) => {
             options: { sort: { createdAt: 1 } },
             populate: { path: "user", select: "username name profileImage" }
         });
+    if (!updatedReport) throwError("The provided _id for the report does not match any report you posted!", 404);
     return updatedReport;
-};
-
-const checkDeleteReportIdValid = reportId => {
-    if (!(reportId.length === 24) || !/^[a-z0-9]+$/.test(reportId)) {
-        const error = new Error("Provided _id for the report is invalid!");
-        error.status = 400;
-        throw error;
-    };
-};
-
-const checkDeleteReportIdExists = deletedReport => {
-    if (!deletedReport) {
-        const error = new Error("The provided _id for the report does not match any report you posted!");
-        error.status = 404;
-        throw error;
-    };
 };
 
 const removeReport = async (reportId, userId) => {
     const deletedReport = await Report.findOneAndDelete({ _id: reportId, user: userId }).select("comments -_id");
-    checkDeleteReportIdExists(deletedReport);
+    if (!deletedReport) throwError("The provided _id for the report does not match any report you posted!", 404);
     await Comment.deleteMany({ report: reportId });
     await User.findByIdAndUpdate(userId, { $pull: { reports: reportId } });
 
@@ -105,7 +73,7 @@ const removeReport = async (reportId, userId) => {
 };
 
 reportFunctions.deleteReport = async (reportId, userId) => {
-    checkDeleteReportIdValid(reportId);
+    checkId(reportId, "report");
     await removeReport(reportId, userId);
 };
 

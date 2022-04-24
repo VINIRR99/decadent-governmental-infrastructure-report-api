@@ -43,6 +43,10 @@ router.delete("/:commentId", async (req, res) => {
         res.status(204).json();
     } catch (error) {
         if (!error.status) error.status = 500;
+        if ((error.status === 500) && (error.path === "_id")) {
+            error.status = 404;
+            error.message = "The provided _id for the comment does not match any report you posted!";
+        };
         res.status(error.status).json({ message: "Error while trying to delete comment!", error: error.message });
     };
 });

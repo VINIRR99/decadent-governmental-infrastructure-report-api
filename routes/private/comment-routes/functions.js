@@ -1,27 +1,15 @@
 const Comment = require("../../../models/Comment.model");
 const User = require("../../../models/User.model");
 const Report = require("../../../models/Report.model");
+const { checkId, throwError } = require("../../generalFunctions");
 
 const commentFunctions = {};
-
-const checkId = (idToCheck, idOwner) => {
-    if (!(idToCheck.length === 24) || !/^[a-z0-9]+$/.test(idToCheck)) {
-        const error = new Error(`Provided _id for the ${idOwner} is invalid!`);
-        error.status = 400;
-        throw error;
-    };
-};
 
 const checkCommentInput = async (idToCheck, idOwner, input) => {
     checkId(idToCheck, idOwner);
 
     const { comment } = await input;
-
-    if (!comment) {
-        const error = new Error("Comment is required!");
-        error.status = 400;
-        throw error;
-    };
+    if (!comment) throwError("Comment is required!", 400);
 
     return { comment };
 };
@@ -56,17 +44,8 @@ commentFunctions.putComment = async (commentId, userId, input) => {
     return updatedComment;
 };
 
-const checkDeleteCommentIdExists = deletedComment => {
-    if (!deletedComment) {
-        const error = new Error("The provided _id for the comment does not match any comment you posted!");
-        error.status = 404;
-        throw error;
-    };
-};
-
 const removeComment = async (commentId, userId) => {
     const deletedComment = await Comment.findOneAndDelete({ _id: commentId, user: userId }).select("_id");
-    checkDeleteCommentIdExists(deletedComment);
     await Report.findOneAndUpdate({ comments: { $in: [commentId] } }, { $pull: { comments: commentId } });
     await User.findOneAndUpdate({ comments: { $in: [commentId] } }, { $pull: { comments: commentId } });
 };

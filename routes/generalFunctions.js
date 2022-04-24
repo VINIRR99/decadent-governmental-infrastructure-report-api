@@ -12,10 +12,9 @@ const checkId = (idToCheck, idOwner) => {
     };
 };
 
-const checkPassword = async (userId, password, User) => {
-    const { password: passwordHash } = await User.findById(userId, { password: 1, _id: 0 });
+const checkPassword = async (password, passwordHash, invalidMsg) => {
     const compareHash = await compare(password, passwordHash);
-    if (!compareHash) throwError("Password is invalid!", 401);
+    if (!compareHash) throwError(invalidMsg, 401);
 };
 
 const generatePasswordHash = async password => {

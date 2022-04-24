@@ -1,4 +1,5 @@
 const Report = require("../../../models/Report.model");
+const { checkId, throwError } = require("../../generalFunctions");
 
 const getReportFunctions = {};
 
@@ -19,14 +20,6 @@ getReportFunctions.getAllReports = async () => {
     return reports;
 };
 
-const checkReportIdValid = reportId => {
-    if (!(reportId.length === 24) || !/^[a-z0-9]+$/.test(reportId)) {
-        const error = new Error("Provided _id for the report is invalid!");
-        error.status = 400;
-        throw error;
-    };
-};
-
 const findReport = async reportId => {
     const report = await Report.findOne({ _id: reportId }, { __v: 0 }).populate({
         path: "comments",
@@ -37,18 +30,10 @@ const findReport = async reportId => {
     return report;
 };
 
-const checkReportExists = report => {
-    if (!report) {
-        const error = new Error("Provided _id for the report does not match any report in our database!");
-        error.status = 404;
-        throw error;
-    };
-};
-
 getReportFunctions.getOneReport = async reportId => {
-    checkReportIdValid(reportId);
+    checkId(reportId, "report")
     const report = await findReport(reportId);
-    checkReportExists(report);
+    if (!report) throwError("Provided _id for the report does not match any report in our database!", 404);
     return report;
 };
 

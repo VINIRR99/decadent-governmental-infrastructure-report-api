@@ -20,8 +20,8 @@ const checkUserInputs = async (inputs, userId) => {
     if (readLater) {
         if ((readLater.slice(0, 1) !== "+") && (readLater.slice(0, 1) !== "-")) {
             throwError(
-                `The string "+" or "-" are necessary at the beginning of readLater! "+" to indicate to add the report"
-                and "-" is to indicate to remove a report.`,
+                'The string "+" or "-" are necessary at the beginning of readLater! "+" to indicate to add the ' +
+                'report and "-" is to indicate to remove a report.',
                 400
             );
         };
@@ -44,7 +44,8 @@ const checkUserInputs = async (inputs, userId) => {
     };
 
     if ((username || (newPassword && newPasswordConfirmation)) && password) {
-        await checkPassword(userId, password, User);
+        const { password: passwordHash } = await User.findById(userId, { password: 1, _id: 0 });
+        await checkPassword(password, passwordHash, "Password is invalid!");
         if (username) checkedInputs.username = username;
         if (newPassword) checkedInputs.password = newPassword;
     };
