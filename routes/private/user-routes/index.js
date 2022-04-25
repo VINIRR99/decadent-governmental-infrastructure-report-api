@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { updateUser } = require("./functions");
+const { updateUser, deleteUser } = require("./functions");
 
 const router = Router();
 
@@ -11,6 +11,17 @@ router.put("/", async (req, res) => {
     } catch (error) {
         if (!error.status) error.status = 500;
         res.status(error.status).json({ message: "Error while updating an user information!", error: error.message });
+    };
+});
+
+router.delete("/", async (req, res) => {
+    try {
+        const { _id: userId } = await req.user;
+        await deleteUser(userId, await req.body);
+        res.status(204).json();
+    } catch (error) {
+        if (!error.status) error.status = 500;
+        res.status(error.status).json({ message: "Error while deleting user!", error: error.message });
     };
 });
 

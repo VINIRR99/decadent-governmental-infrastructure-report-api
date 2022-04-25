@@ -1,5 +1,6 @@
 const User = require("../../../models/User.model");
 const Report = require("../../../models/Report.model");
+const Comment = require("../../../models/Comment.model");
 const { throwError, checkPassword, checkId, generatePasswordHash } = require("../../generalFunctions");
 
 const userFunctions = {};
@@ -61,6 +62,83 @@ userFunctions.updateUser = async (inputs, userId) => {
     if (checkedInputs.password) checkedInputs.password = await generatePasswordHash(checkedInputs.password);
     const updatedUser = await User.findByIdAndUpdate(userId, checkedInputs, { new: true }).select("-password -__v");
     return updatedUser;
+};
+
+const checkDeleteUserInputs = async (userId, inputs) => {
+    const { username, password } = await inputs;
+    
+    if (!username) throwError("Username is required!", 400);
+    if (!password) throwError("Password is required!", 400);
+
+    const user = await User.findOne({ _id: userId, username }, { password: 1, _id: 0 });
+    if(!user) throwError("Invalid username or password!", 401);
+    
+    const { password: passwordHash } = await user;
+    await checkPassword(password, passwordHash, "Invalid username or password!");
+};
+/*
+const removeUser1 = async userId => {
+    //await User.findByIdAndDelete(userId);
+    const reports = await Report.find({ user: userId }, { comments: 1 });
+    const commentsId = [];
+    for (let i = 0; i < reports.length; i += 1) commentsId.push(...reports[i].comments);
+    //return comments;
+    const newComments = await Comment.find({ _id: { $in: commentsId } });
+    const users = await User.find({ comments: { $in: commentsId } });
+
+    const deletedCommentsData = await Comment.find({ user: userId }, { _id: 1 });
+    const deletedComments = deletedCommentsData.map(comment => comment._id);
+    const updatedReports = await Report.find({ comments: { $in: deletedComments } });
+    return commentsId;
+    //await Comment.deleteMany({ user: userId });
+};
+
+const removeUser2 = async userId => {
+    await User.findByIdAndDelete(userId);
+
+    const deletedReports = await Report.deleteMany({ user: userId }).select("comments -_id");
+    const commentsId = [];
+    for (let i = 0; i < deletedReports.length; i += 1) commentsId.push(...deletedReports[i].comments);
+    const reportComments = await Comment.deleteMany({ _id: { $in: commentsId } }).select("_id");
+
+    const reportCommentsIds = reportComments.map(comment => comment._id);
+
+    await User.updateMany( { comments: { $in: reportCommentsIds } }, { $pull: { comments: { $in: reportCommentsIds } } });
+
+    const userComments = await Comment.deleteMany({ user: userId }).select("_id");
+    const userCommentsIds = userComments.map(comment => comment._id);
+    await Report.updateMany({ comments: { $in: userCommentsIds } }, { $pull: { comments: { $in: userCommentsIds } } });
+}; */
+
+const removeUser = async userId => {
+    await User.findByIdAndDelete(userId);
+
+    const deletedReports = await Report.find({ user: userId }, { comments: 1, _id: 0 });
+    await Report.deleteMany({ user: userId });
+
+    const commentsId = [];
+    for (let i = 0; i < deletedReports.length; i += 1) commentsId.push(...deletedReports[i].comments);
+    
+    const deletedCommentsData = await Comment.find(
+        { $or: [{ _id: { $in: commentsId } }, { user: userId }] },
+        { _id: 1 }
+    );
+    await Comment.deleteMany({
+        $or: [
+            { _id: { $in: commentsId } },
+            { user: userId }
+        ]
+    });
+
+    const deletedComments = deletedCommentsData.map(comment => comment._id);
+
+    await User.updateMany({ comments: { $in: deletedComments } }, { $pull: { comments: { $in: deletedComments } } });
+    await Report.updateMany({ comments: { $in: deletedComments } }, { $pull: { comments: { $in: deletedComments } } });
+};
+
+userFunctions.deleteUser = async (userId, inputs) => {
+    await checkDeleteUserInputs(userId, inputs);
+    await removeUser(userId);
 };
 
 module.exports = userFunctions;

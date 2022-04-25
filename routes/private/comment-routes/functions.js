@@ -46,6 +46,7 @@ commentFunctions.putComment = async (commentId, userId, input) => {
 
 const removeComment = async (commentId, userId) => {
     const deletedComment = await Comment.findOneAndDelete({ _id: commentId, user: userId }).select("_id");
+    if (!deletedComment) throwError("Provided id for the comment does not match any comment you created", 404);
     await Report.findOneAndUpdate({ comments: { $in: [commentId] } }, { $pull: { comments: commentId } });
     await User.findOneAndUpdate({ comments: { $in: [commentId] } }, { $pull: { comments: commentId } });
 };
