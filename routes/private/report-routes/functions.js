@@ -41,7 +41,7 @@ const checkUpudateReportInputs = async (reportId, inputs) => {
     if (description) checkedInputs.description = description;
     if (image) checkedInputs.image = image;
     if (location) checkedInputs.location = location;
-    if (fixed) {
+    if (fixed !== undefined) {
         if (typeof(fixed) !== "boolean") throwError("fixed field must always be a boolean!", 400);
         checkedInputs.fixed = fixed;
     };
