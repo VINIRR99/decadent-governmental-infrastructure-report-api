@@ -11,7 +11,7 @@ getReportFunctions.getAllReports = async () => {
             path: "comments",
             select: "-report -__v",
             options: { sort: { createdAt: 1 } },
-            limit: 3,
+            limit: 4,
             populate: { path: "user", select: "username name profileImage" }
         }).populate("user", "username name profileImage").sort({ createdAt: reportsOrder[i].order });
 
