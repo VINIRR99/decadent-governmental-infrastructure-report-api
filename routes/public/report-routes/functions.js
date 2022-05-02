@@ -20,6 +20,29 @@ getReportFunctions.getAllReports = async () => {
     return reports;
 };
 
+getReportFunctions.getSearchResults = async search => {
+    const reportsOrder = [{ boolean: false, order: 1 }, { boolean: true, order: -1 }];
+    const searchResults = [];
+    for (let i = 0; i < reportsOrder.length; i += 1) {
+        const foundReports = await Report.find(
+            {
+                fixed: reportsOrder[i].boolean,
+                description: { $regex: search }
+            },
+            { __v: 0 }
+        ).populate({
+            path: "comments",
+            select: "-report -__v",
+            options: { sort: { createdAt: 1 } },
+            limit: 4,
+            populate: { path: "user", select: "username name profileImage" }
+        }).populate("user", "username name profileImage").sort({ createdAt: reportsOrder[i].order });
+
+        searchResults.push(...foundReports);
+    };
+    return searchResults;
+};
+
 const findReport = async reportId => {
     const report = await Report.findOne({ _id: reportId }, { __v: 0 }).populate({
         path: "comments",
