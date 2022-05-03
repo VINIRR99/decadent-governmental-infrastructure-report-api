@@ -1,6 +1,5 @@
 const User = require("../../../models/User.model");
 const Report = require("../../../models/Report.model");
-const { throwError } = require("../../generalFunctions");
 
 const getUserFunction = {};
 
@@ -23,7 +22,6 @@ const checkUserGetRequest = async username => {
         select: "-user -__v",
         populate: { path: "report", select: "description" }
     });
-    if (!user) throwError("Provided _id for user does not match with any user in our database!", 404);
 
     return user;
 };
@@ -44,8 +42,8 @@ const addUserFixedReports = async (userId, userReports) => {
 
 getUserFunction.getUser = async username => {
     const user = await checkUserGetRequest(username);
-    user.reports = await addUserFixedReports(user._id, user.reports);
-    return user;
+    if (user) user.reports = await addUserFixedReports(user._id, user.reports);
+    return user ? user : 404;
 };
 
 module.exports = getUserFunction;
