@@ -1,13 +1,11 @@
 const User = require("../../../models/User.model");
 const Report = require("../../../models/Report.model");
-const { checkId, throwError } = require("../../generalFunctions");
+const { throwError } = require("../../generalFunctions");
 
 const getUserFunction = {};
 
-const checkUserGetRequest = async userId => {
-    checkId(userId, "user");
-
-    const user = await User.findById(userId, { password: 0, __v: 0 }).populate({
+const checkUserGetRequest = async username => {
+    const user = await User.findOne({ username }, { password: 0, __v: 0 }).populate({
         path: "reports",
         match: { fixed: false },
         select: "-__v -user",
@@ -44,9 +42,9 @@ const addUserFixedReports = async (userId, userReports) => {
     return addedUserFixedReports;
 };
 
-getUserFunction.getUser = async userId => {
-    const user = await checkUserGetRequest(userId);
-    user.reports = await addUserFixedReports(userId, user.reports);
+getUserFunction.getUser = async username => {
+    const user = await checkUserGetRequest(username);
+    user.reports = await addUserFixedReports(user._id, user.reports);
     return user;
 };
 

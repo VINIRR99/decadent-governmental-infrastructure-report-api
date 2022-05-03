@@ -3,10 +3,10 @@ const { getUser } = require("./functions");
 
 const router = Router();
 
-router.get("/:userId", async (req, res) => {
+router.get("/:username", async (req, res) => {
     try {
-        const { userId } = req.params;
-        const user = await getUser(userId);
+        const { username } = req.params;
+        const user = await getUser(username);
         res.status(200).json(user);
     } catch (error) {
         if (!error.status) error.status = 500;
