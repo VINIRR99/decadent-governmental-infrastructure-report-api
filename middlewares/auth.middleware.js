@@ -7,8 +7,5 @@ module.exports = (req, res, next) => {
         const decodedToken = verify(token, process.env.SECRET_JWT);
         req.user = { ...decodedToken };
         next();
-    } catch (error) {
-        const errorStatus = (error.name === "JsonWebTokenError") ? 401 : 500;
-        res.status(errorStatus).json({ message: "Error in authorization middleware!", error: error.message });
-    };
+    } catch (error) {res.status(401).json({ message: "Error in authorization middleware!", error: error.message })};
 };
