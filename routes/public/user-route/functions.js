@@ -13,7 +13,7 @@ const checkUserGetRequest = async username => {
             path: "comments",
             select: "-__v -report",
             options: { sort: { createdAt: 1 } },
-            limit: 3,
+            limit: 4,
             populate: { path: "user", select: "name username profileImage" }
         }
     }).populate({
