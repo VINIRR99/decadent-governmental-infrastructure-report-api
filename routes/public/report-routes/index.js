@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
     } catch (error) {res.status(500).json({ message: "Error when trying to get all reports!", error: error.message })};
 });
 
-router.get("/:search", async (req, res) => {
+router.get("/search/:search", async (req, res) => {
     try {
         const { search } = req.params;
         const searchResults = await getSearchResults(search);
