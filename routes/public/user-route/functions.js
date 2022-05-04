@@ -21,6 +21,19 @@ const checkUserGetRequest = async username => {
         options: { sort: { createdAt: -1 } },
         select: "-user -__v",
         populate: { path: "report", select: "description" }
+    }).populate({
+        path: "readLater",
+        select: "-__v",
+        populate: {
+            path: "comments",
+            select: "-__v -report",
+            options: { sort: { createdAt: 1 } },
+            limit: 4,
+            populate: { path: "user", select: "name username profileImage" }
+        }
+    }).populate({
+        path: "readLater",
+        populate: { path: "user", select: "name username profileImage" }
     });
 
     return user;
