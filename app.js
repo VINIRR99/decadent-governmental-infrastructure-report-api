@@ -12,7 +12,7 @@ app.use(express.json());
 
 const corsOptions = {
     credentials: true,
-    origin: [process.env.ACCESS_CONTROL_ALLOW_ORIGIN],
+    origin: process.env.ACCESS_CONTROL_ALLOW_ORIGIN,
     methods: ["GET", "POST", "PUT", "DELETE"]
 };
 
