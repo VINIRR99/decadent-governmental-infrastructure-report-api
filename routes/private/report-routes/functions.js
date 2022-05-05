@@ -8,11 +8,11 @@ const reportFunctions = {};
 const checkReportCreationInputs = async (userId, inputs) => {
     const { description, image, location  } = await inputs;
 
-    if (!image) throwError("Image is required!", 400);
     if (!location) throwError("Location is required!", 400);
 
     const checkedInputs = { image, location, user: userId };
     if (description) checkedInputs.description = description;
+    if (image) checkedInputs.image = image;
 
     return checkedInputs;
 };

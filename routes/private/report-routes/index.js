@@ -1,4 +1,5 @@
 const { Router } = require("express");
+const uploadCloud = require("../../../configs/cloudinary.config");
 const { postNewReport, updateReport, deleteReport } = require("./functions");
 
 const router = Router();
@@ -12,6 +13,23 @@ router.post("/", async (req, res) => {
         if (!error.status) error.status = 500;
         res.status(error.status).json({ message: "Error while creating new Reports!", error: error.message });
     };
+});
+
+router.put("/upload-image/:reportId", uploadCloud.single("image"), async (req, res) => {
+    try {
+        const { path: image } = req.file;
+        const { reportId } = req.params;
+        const { _id: userId } = await req.user;
+        const updatedReport = await updateReport(reportId, userId, { image });
+        res.status(200).json(updatedReport);
+    } catch (error) {
+        if (!error.status) error.status = 500;
+        if ((error.status === 500) && (error.path === "_id")) {
+            error.status = 404;
+            error.message = "The provided _id for the report does not match any report you posted!";
+        };
+        res.status(error.status).json({ message: "Error while uploading image", error: error.message })
+    }
 });
 
 router.put("/:reportId", async (req, res) => {
