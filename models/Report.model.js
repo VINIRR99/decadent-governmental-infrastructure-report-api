@@ -6,7 +6,7 @@ module.exports = model("Report", new Schema(
         description: { type: String, trim: true, maxlength: 2200, default: "" },
         image: {
             type: String,
-            required: true
+            default: "https://res.cloudinary.com/dulbuc924/image/upload/v1651761945/reports/lyp8kvhuymamdlrorgsg.jpg"
         },
         location: { type: String, trim: true, required: true },
         fixed: { type: Boolean, required: true, default: false },
