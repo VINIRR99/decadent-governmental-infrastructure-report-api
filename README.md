@@ -25,8 +25,8 @@
 Obs: on updating readLater is accepted two strings as values.
 ```
 // reportIdtoAdd is the id of the report to be added to the readLater array of the user
-{ "readLater": "add " + reportIdtoAdd }
+{ "readLater": "add " +reportIdtoAdd }
 
 // reportIdtoRemove is the id of the report to be removed of the readLater array of the user
-{ "readLater": "remove " + reportIdtoRemove }
+{ "readLater": "remove " +reportIdtoRemove }
 ```
