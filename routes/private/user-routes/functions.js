@@ -76,48 +76,17 @@ const checkDeleteUserInputs = async (userId, inputs) => {
     const { password: passwordHash } = await user;
     await checkPassword(password, passwordHash, "Invalid username or password!");
 };
-/*
-const removeUser1 = async userId => {
-    //await User.findByIdAndDelete(userId);
-    const reports = await Report.find({ user: userId }, { comments: 1 });
-    const commentsId = [];
-    for (let i = 0; i < reports.length; i += 1) commentsId.push(...reports[i].comments);
-    //return comments;
-    const newComments = await Comment.find({ _id: { $in: commentsId } });
-    const users = await User.find({ comments: { $in: commentsId } });
-
-    const deletedCommentsData = await Comment.find({ user: userId }, { _id: 1 });
-    const deletedComments = deletedCommentsData.map(comment => comment._id);
-    const updatedReports = await Report.find({ comments: { $in: deletedComments } });
-    return commentsId;
-    //await Comment.deleteMany({ user: userId });
-};
-
-const removeUser2 = async userId => {
-    await User.findByIdAndDelete(userId);
-
-    const deletedReports = await Report.deleteMany({ user: userId }).select("comments -_id");
-    const commentsId = [];
-    for (let i = 0; i < deletedReports.length; i += 1) commentsId.push(...deletedReports[i].comments);
-    const reportComments = await Comment.deleteMany({ _id: { $in: commentsId } }).select("_id");
-
-    const reportCommentsIds = reportComments.map(comment => comment._id);
-
-    await User.updateMany( { comments: { $in: reportCommentsIds } }, { $pull: { comments: { $in: reportCommentsIds } } });
-
-    const userComments = await Comment.deleteMany({ user: userId }).select("_id");
-    const userCommentsIds = userComments.map(comment => comment._id);
-    await Report.updateMany({ comments: { $in: userCommentsIds } }, { $pull: { comments: { $in: userCommentsIds } } });
-}; */
 
 const removeUser = async userId => {
     await User.findByIdAndDelete(userId);
 
-    const deletedReports = await Report.find({ user: userId }, { comments: 1, _id: 0 });
+    const deletedReports = await Report.find({ user: userId }, { comments: 1 });
     await Report.deleteMany({ user: userId });
 
     const commentsId = [];
     for (let i = 0; i < deletedReports.length; i += 1) commentsId.push(...deletedReports[i].comments);
+
+    const deletedReportsId = [...deletedReports].map(report => report._id);
     
     const deletedCommentsData = await Comment.find(
         { $or: [{ _id: { $in: commentsId } }, { user: userId }] },
@@ -133,6 +102,7 @@ const removeUser = async userId => {
     const deletedComments = deletedCommentsData.map(comment => comment._id);
 
     await User.updateMany({ comments: { $in: deletedComments } }, { $pull: { comments: { $in: deletedComments } } });
+    await User.updateMany({ readLater: { $in: deletedReportsId } }, { $pull: { readLater: { $in: deletedReportsId } } });
     await Report.updateMany({ comments: { $in: deletedComments } }, { $pull: { comments: { $in: deletedComments } } });
 };
 

@@ -26,6 +26,9 @@ const createComment = async (checkedInput, reportId, userId) => {
 
 commentFunctions.postNewComment = async (reportId, userId, input) => {
     const checkedInput = await checkCommentInput(reportId, "report", input);
+    const reportToUpdate = await Report.findById(reportId, { _id: 1 });
+    if (!reportToUpdate) throwError("The provided _id for the report does not match any report in our database!", 404);
+
     checkedInput.report = reportId;
     checkedInput.user = userId;
     const createdComment = await createComment(checkedInput, reportId, userId);
@@ -40,6 +43,9 @@ const updateComment = async (checkedInput, commentId, userId) => {
 
 commentFunctions.putComment = async (commentId, userId, input) => {
     const checkedInput = await checkCommentInput(commentId, "comment", input);
+    const commentToUpdate = await Comment.findById(commentId, { _id: 1 });
+    if (!commentToUpdate) throwError("The provided _id for the comment does not match any comment in our database!", 404);
+
     const updatedComment = await updateComment(checkedInput, commentId, userId);
     return updatedComment;
 };

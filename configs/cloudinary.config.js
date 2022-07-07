@@ -10,7 +10,7 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
     cloudinary,
-    params: { folder: "reports", resource_type: "image" }
+    params: { folder: "report-app", resource_type: "image" }
 });
 
 const uploadCloud = multer({ storage });

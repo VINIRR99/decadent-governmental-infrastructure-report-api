@@ -5,7 +5,7 @@ const { sign } = require("jsonwebtoken");
 const authFunctions = {};
 
 const checkSignupInputs = async inputs => {
-    const { username, name, password, passwordConfirmation, profileImage } = await inputs;
+    const { username, name, password, passwordConfirmation } = await inputs;
 
     if (!username) throwError("Username is required!", 400);
 
@@ -21,7 +21,6 @@ const checkSignupInputs = async inputs => {
     if (password !== passwordConfirmation) throwError("Password confirmation is different!", 400);
 
     const checkedInputs = { username, name, password };
-    if (profileImage) checkedInputs.profileImage = profileImage;
 
     return checkedInputs;
 };

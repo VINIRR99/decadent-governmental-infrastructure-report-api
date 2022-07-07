@@ -6,13 +6,11 @@ const { throwError, checkId } = require("../../generalFunctions");
 const reportFunctions = {};
 
 const checkReportCreationInputs = async (userId, inputs) => {
-    const { description, image, location  } = await inputs;
+    const { description  } = await inputs;
 
-    if (!location) throwError("Location is required!", 400);
+    if (!description) throwError("Description is required!", 400);
 
-    const checkedInputs = { image, location, user: userId };
-    if (description) checkedInputs.description = description;
-    if (image) checkedInputs.image = image;
+    const checkedInputs = { description, user: userId };
 
     return checkedInputs;
 };
@@ -35,12 +33,11 @@ reportFunctions.postNewReport = async (userId, inputs) => {
 const checkUpudateReportInputs = async (reportId, inputs) => {
     checkId(reportId, "report");
 
-    const { description, image, location, fixed } = await inputs;
+    const { description, image, fixed } = await inputs;
 
     const checkedInputs = {};
     if (description) checkedInputs.description = description;
     if (image) checkedInputs.image = image;
-    if (location) checkedInputs.location = location;
     if (fixed !== undefined) {
         if (typeof(fixed) !== "boolean") throwError("fixed field must always be a boolean!", 400);
         checkedInputs.fixed = fixed;
@@ -68,8 +65,9 @@ const removeReport = async (reportId, userId) => {
     await Comment.deleteMany({ report: reportId });
     await User.findByIdAndUpdate(userId, { $pull: { reports: reportId } });
 
-    const { comments: commentsId } = await deletedReport;
+    const { comments: commentsId, _id } = await deletedReport;
     await User.updateMany({ comments: { $in: commentsId } }, { $pull: { comments: { $in: commentsId } } });
+    await User.updateMany({ readLater: { $in: reportId } }, { $pull: { readLater: reportId } });
 };
 
 reportFunctions.deleteReport = async (reportId, userId) => {
