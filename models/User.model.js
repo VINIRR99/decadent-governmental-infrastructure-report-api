@@ -12,7 +12,7 @@ module.exports = model("User", new Schema({
     password: { type: String, required: true },
     profileImage: {
         type: String,
-        default: "https://res.cloudinary.com/dulbuc924/image/upload/v1651762677/reports/yjexnthmexd4vmrvfero.jpg"
+        default: "https://res.cloudinary.com/dulbuc924/image/upload/v1657207417/report-app/omec2l61dvp2ehu20gjg.jpg"
     },
     reports: [{ type: Schema.Types.ObjectId, ref: "Report" }],
     comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
