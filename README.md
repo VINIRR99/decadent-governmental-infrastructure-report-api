@@ -2,7 +2,7 @@
 
 # Infrastructure Report - API
 
-My third and final project of the Ironhack Web Development bootcamp was an full-stack application app to denouce decadent government infrastructures linke schools, roads, etc.
+My third and final project of the Ironhack Web Development bootcamp was an full-stack application app to denouce decadent government infrastructures like schools, roads, etc.
 In this repository is stored the backend of the project.
 
 ## Links
